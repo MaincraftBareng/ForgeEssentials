@@ -3,7 +3,10 @@ package com.forgeessentials.teleport;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.function.Function;
 
+import com.forgeessentials.api.economy.WalletHelper;
+import com.forgeessentials.core.misc.PriceMaps;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -23,6 +26,8 @@ import com.forgeessentials.util.ServerUtil;
 
 public class CommandPersonalWarp extends ParserCommandBase
 {
+    private Function<Long,Long> tpPricing = PriceMaps.linear(1.5);
+    private Function<Long,Long> setPricing = PriceMaps.powered(1.5, 500, 500);
 
     public static class PersonalWarp extends HashMap<String, WarpPoint>
     {
@@ -119,7 +124,7 @@ public class CommandPersonalWarp extends ParserCommandBase
             WarpPoint point = warps.get(warpName);
             if (point == null)
                 throw new TranslatedCommandException("Warp by this name does not exist");
-            TeleportHelper.teleport(arguments.senderPlayer, point);
+            TeleportHelper.paidTeleport(arguments.senderPlayer, point, tpPricing);
         }
         else
         {
@@ -140,6 +145,7 @@ public class CommandPersonalWarp extends ParserCommandBase
 
                 warps.put(warpName, new WarpPoint(arguments.senderPlayer));
                 arguments.confirm("Set personal warp \"%s\" to current location", warpName);
+                WalletHelper.payOrThrow(arguments.senderPlayer, warps.size(), setPricing);
                 break;
             case "del":
             case "delete":

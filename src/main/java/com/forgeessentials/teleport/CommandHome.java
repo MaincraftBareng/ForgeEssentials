@@ -1,7 +1,9 @@
 package com.forgeessentials.teleport;
 
 import java.util.List;
+import java.util.function.Function;
 
+import com.forgeessentials.core.misc.PriceMaps;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -22,6 +24,8 @@ import com.forgeessentials.util.output.ChatOutputHandler;
 
 public class CommandHome extends ForgeEssentialsCommandBase
 {
+    //todo: read from config
+    private Function<Long,Long> tpPricing = PriceMaps.linear(1);
 
     @Override
     public String getName()
@@ -74,7 +78,7 @@ public class CommandHome extends ForgeEssentialsCommandBase
             WarpPoint home = PlayerInfo.get(sender.getPersistentID()).getHome();
             if (home == null)
                 throw new TranslatedCommandException("No home set. Use \"/home set\" first.");
-            TeleportHelper.teleport(sender, home);
+            TeleportHelper.paidTeleport(sender, home, tpPricing);
         }
         else
         {

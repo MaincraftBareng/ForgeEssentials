@@ -1,7 +1,12 @@
 package com.forgeessentials.teleport;
 
-import java.util.List;
-
+import com.forgeessentials.api.UserIdent;
+import com.forgeessentials.commons.selections.WarpPoint;
+import com.forgeessentials.core.commands.ForgeEssentialsCommandBase;
+import com.forgeessentials.core.misc.PriceMaps;
+import com.forgeessentials.core.misc.TeleportHelper;
+import com.forgeessentials.core.misc.TranslatedCommandException;
+import com.forgeessentials.util.PlayerInfo;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -11,19 +16,16 @@ import net.minecraft.util.math.BlockPos;
 import net.minecraft.world.World;
 import net.minecraftforge.common.DimensionManager;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fml.common.FMLCommonHandler;
 import net.minecraftforge.server.permission.DefaultPermissionLevel;
 import net.minecraftforge.server.permission.PermissionAPI;
 
-import com.forgeessentials.api.UserIdent;
-import com.forgeessentials.commons.selections.WarpPoint;
-import com.forgeessentials.core.commands.ForgeEssentialsCommandBase;
-import com.forgeessentials.core.misc.TeleportHelper;
-import com.forgeessentials.core.misc.TranslatedCommandException;
-import com.forgeessentials.util.PlayerInfo;
+import java.util.List;
+import java.util.function.Function;
 
 public class CommandBed extends ForgeEssentialsCommandBase
 {
+    //todo: read from config
+    private Function<Long,Long> tpPricing = PriceMaps.linear(1);
 
     public CommandBed()
     {
@@ -107,7 +109,7 @@ public class CommandBed extends ForgeEssentialsCommandBase
 
         PlayerInfo.get(player.getPersistentID()).setLastTeleportOrigin(new WarpPoint(player));
         WarpPoint spawnPoint = new WarpPoint(world.provider.getDimension(), spawn, player.rotationPitch, player.rotationYaw);
-        TeleportHelper.teleport(player, spawnPoint);
+        TeleportHelper.paidTeleport(player, spawnPoint, tpPricing);
     }
 
     @Override

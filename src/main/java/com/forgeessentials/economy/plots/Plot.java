@@ -136,6 +136,8 @@ public class Plot
 
     public void setOwner(UserIdent newOwner)
     {
+        if(newOwner != null)
+            return;
         if (newOwner == null)
             throw new IllegalArgumentException();
         if (newOwner == owner || newOwner.equals(owner))

@@ -4,7 +4,9 @@ import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Function;
 
+import com.forgeessentials.api.economy.Wallet;
 import net.minecraft.block.Block;
 import net.minecraft.command.CommandException;
 import net.minecraft.entity.Entity;
@@ -130,6 +132,18 @@ public class TeleportHelper extends ServerEventHandler
     public static final String TELEPORT_PORTALTO = "fe.teleport.portalto";
 
     private static Map<UUID, TeleportInfo> tpInfos = new HashMap<>();
+
+    public static void paidTeleport(EntityPlayerMP player, WarpPoint point, Function<Long,Long> priceMap) throws CommandException {
+        Wallet wallet = APIRegistry.economy.getWallet(UserIdent.get(player.getUniqueID()));
+        double distance = player.getPositionVector().distanceTo(point.toVec3());
+        long price = priceMap.apply((long) distance);
+        if( wallet.withdraw(price) ){
+            teleport(player, point);
+        } else {
+            String money = APIRegistry.economy.currency(price);
+            throw new TranslatedCommandException("you don't have enough "+money+": "+price+" "+money+" are required");
+        }
+    }
 
     public static void teleport(EntityPlayerMP player, WarpPoint point) throws CommandException
     {

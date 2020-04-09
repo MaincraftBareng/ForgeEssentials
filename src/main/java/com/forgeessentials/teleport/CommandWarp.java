@@ -3,7 +3,10 @@ package com.forgeessentials.teleport;
 import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
+import com.forgeessentials.api.economy.WalletHelper;
+import com.forgeessentials.core.misc.PriceMaps;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.Entity;
@@ -23,6 +26,8 @@ import com.forgeessentials.util.ServerUtil;
 
 public class CommandWarp extends ParserCommandBase
 {
+    private Function<Long,Long> tpPricing = PriceMaps.linear(1.5);
+    private Function<Long,Long> setPricing = PriceMaps.powered(1.5, 500, 500);
 
     public static class Warp extends WarpPoint
     {
@@ -123,7 +128,7 @@ public class CommandWarp extends ParserCommandBase
                 throw new TranslatedCommandException("Warp by this name does not exist");
             if (!arguments.hasPermission(PERM_WARP + "." + warpName))
                 throw new TranslatedCommandException("You don't have permission to use this warp");
-            TeleportHelper.teleport(arguments.senderPlayer, point);
+            TeleportHelper.paidTeleport(arguments.senderPlayer, point, tpPricing);
         }
         else
         {
@@ -141,6 +146,7 @@ public class CommandWarp extends ParserCommandBase
                 int limit = ServerUtil.parseIntDefault(APIRegistry.perms.getUserPermissionProperty(arguments.ident, PERM_LIMIT), Integer.MAX_VALUE);
                 if (warps.size() >= limit)
                     throw new TranslatedCommandException("You reached the warp limit");
+                WalletHelper.payOrThrow(arguments.senderPlayer,warps.size(),setPricing);
 
                 DataManager.getInstance().save(new Warp(arguments.senderPlayer), warpName);
                 arguments.confirm("Set warp \"%s\" to current location", warpName);

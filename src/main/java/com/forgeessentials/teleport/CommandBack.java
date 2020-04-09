@@ -1,5 +1,6 @@
 package com.forgeessentials.teleport;
 
+import com.forgeessentials.core.misc.PriceMaps;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -14,8 +15,12 @@ import com.forgeessentials.core.misc.TeleportHelper;
 import com.forgeessentials.core.misc.TranslatedCommandException;
 import com.forgeessentials.util.PlayerInfo;
 
+import java.util.function.Function;
+
 public class CommandBack extends ForgeEssentialsCommandBase
 {
+    //todo: read from config
+    private Function<Long,Long> tpPricing = PriceMaps.linear(3);
 
     @Override
     public String getName()
@@ -65,7 +70,7 @@ public class CommandBack extends ForgeEssentialsCommandBase
         if (point == null)
             throw new TranslatedCommandException("You have nowhere to get back to");
 
-        TeleportHelper.teleport(sender, point);
+        TeleportHelper.paidTeleport(sender, point, tpPricing);
     }
 
 }

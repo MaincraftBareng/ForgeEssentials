@@ -1,5 +1,6 @@
 package com.forgeessentials.teleport;
 
+import com.forgeessentials.core.misc.PriceMaps;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.world.WorldServer;
@@ -16,8 +17,11 @@ import com.forgeessentials.util.questioner.Questioner;
 import com.forgeessentials.util.questioner.QuestionerCallback;
 import com.forgeessentials.util.questioner.QuestionerStillActiveException;
 
+import java.util.function.Function;
+
 public class CommandTPA extends ParserCommandBase
 {
+    private Function<Long,Long> tpPricing = PriceMaps.linear(4);
 
     public static final String PERM_HERE = TeleportModule.PERM_TPA + ".here";
     public static final String PERM_LOCATION = TeleportModule.PERM_TPA + ".loc";
@@ -90,7 +94,7 @@ public class CommandTPA extends ParserCommandBase
                                 else
                                 try
                                 {
-                                    TeleportHelper.teleport(arguments.senderPlayer, new WarpPoint(player.getPlayer()));
+                                    TeleportHelper.paidTeleport(arguments.senderPlayer, new WarpPoint(player.getPlayer()),tpPricing);
                                 }
                                 catch (CommandException e)
                                 {
@@ -142,7 +146,7 @@ public class CommandTPA extends ParserCommandBase
                     else
                         try
                         {
-                            TeleportHelper.teleport(player.getPlayerMP(), point);
+                            TeleportHelper.paidTeleport(player.getPlayerMP(), point, tpPricing);
                         }
                         catch (CommandException e)
                         {

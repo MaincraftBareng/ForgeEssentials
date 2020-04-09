@@ -1,5 +1,6 @@
 package com.forgeessentials.teleport;
 
+import com.forgeessentials.core.misc.PriceMaps;
 import net.minecraft.command.CommandException;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayerMP;
@@ -22,8 +23,11 @@ import com.forgeessentials.core.misc.TeleportHelper;
 import com.forgeessentials.core.misc.TranslatedCommandException;
 import com.forgeessentials.util.PlayerUtil;
 
+import java.util.function.Function;
+
 public class CommandJump extends ForgeEssentialsCommandBase
 {
+    private Function<Long,Long> tpPricing = PriceMaps.linear(5);
 
     public CommandJump()
     {
@@ -78,8 +82,9 @@ public class CommandJump extends ForgeEssentialsCommandBase
         if (mo == null)
             throw new TranslatedCommandException("The spot you are looking at is too far away to teleport.");
         BlockPos pos = mo.getBlockPos();
-        TeleportHelper.teleport(player, new WarpPoint(player.getEntityWorld().provider.getDimension(), pos.getX(), pos.getY() + 1, pos.getZ(),
-                player.rotationPitch, player.rotationYaw));
+        WarpPoint target = new WarpPoint(player.getEntityWorld().provider.getDimension(), pos.getX(), pos.getY() + 1, pos.getZ(),
+            player.rotationPitch, player.rotationYaw);
+        TeleportHelper.paidTeleport(player, target, tpPricing);
     }
 
     @SubscribeEvent
