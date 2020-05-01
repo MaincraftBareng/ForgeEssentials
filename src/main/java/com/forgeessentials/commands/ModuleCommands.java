@@ -1,5 +1,6 @@
 package com.forgeessentials.commands;
 
+import com.forgeessentials.commands.info.CommandVillage;
 import net.minecraftforge.fml.common.event.FMLPreInitializationEvent;
 import net.minecraftforge.fml.common.eventhandler.SubscribeEvent;
 
@@ -77,6 +78,7 @@ public class ModuleCommands
     @SubscribeEvent
     public void load(FEModuleInitEvent event)
     {
+        FECommandManager.registerCommand(new CommandVillage());
         FECommandManager.registerCommand(new CommandTime());
         FECommandManager.registerCommand(new CommandEnchant());
         FECommandManager.registerCommand(new CommandDechant());
