@@ -5,6 +5,7 @@ import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import com.forgeessentials.commands.util.CreditGivingTickTask;
 import net.minecraft.command.ICommand;
 import net.minecraft.command.ICommandSender;
 import net.minecraft.entity.player.EntityPlayer;
@@ -341,6 +342,9 @@ public class ForgeEssentials extends ConfigLoaderBase
         // Do permission registration in first server tick.
         // TODO This can be removed if the Permission API gets accepted!
         MinecraftForge.EVENT_BUS.register(new CommandPermissionRegistrationHandler());
+
+        //give 5 credit every 100 ticks (5 seconds)
+        TaskRegistry.schedule(new CreditGivingTickTask());
     }
 
     public static final class CommandPermissionRegistrationHandler
