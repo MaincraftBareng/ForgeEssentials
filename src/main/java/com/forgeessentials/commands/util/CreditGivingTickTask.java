@@ -9,16 +9,17 @@ import net.minecraft.entity.player.EntityPlayerMP;
 
 public class CreditGivingTickTask implements TaskRegistry.TickTask {
 
-  int tickNum = 0;
+  long lastGave = System.currentTimeMillis();
 
   @Override
   public boolean tick() {
-    tickNum = (tickNum + 1) % 100;
-    if(tickNum == 0){
+    long now = System.currentTimeMillis();
+    if(now - lastGave >= 5000){
       for(EntityPlayerMP player: ServerUtil.getPlayerList()){
         Wallet wallet = APIRegistry.economy.getWallet(UserIdent.get(player.getUniqueID()));
         wallet.add(5);
       }
+      lastGave = now;
     }
     return false;
   }
